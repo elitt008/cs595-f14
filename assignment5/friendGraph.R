@@ -1,0 +1,16 @@
+png(filename="friendGraph.png",height=512,width=512,bg="white")
+data <- read.table("formatted.dat")
+length <- length(data$V1)
+color <- "gray"
+color <- rep(color,length)
+index <- match("user",data$V1)
+color[index] <- "blue"
+stdev <- signif(sd(data$V2),5)
+avg <- signif(mean(data$V2),5)
+med <- median(data$V2)
+write.table(data$V2[index],file="data.dat",row.names='User friends:\t',col.names=FALSE,quote=FALSE)
+write.table(med,file="data.dat",row.names='Median:\t\t',col.names=FALSE,quote=FALSE,append=TRUE)
+write.table(avg,file="data.dat",append=TRUE,row.names='Mean:\t\t',col.names=FALSE,quote=FALSE)
+write.table(stdev,file="data.dat",append=TRUE,row.names='Standard dev:\t',col.names=FALSE,quote=FALSE)
+barplot(data$V2,names.arg=data$V1,col=color,xlab="friend",ylab="friend count")
+dev.off()
