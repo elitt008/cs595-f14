@@ -1,46 +1,115 @@
 <!DOCTYPE html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js"></script>
-<div id="graph">
-</div>
+<meta charset="utf-8">
 <style>
-circle {
-  color: black;
+
+.link line {
+  stroke: #696969;
 }
+
+.link line.separator {
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+.node circle {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
 </style>
-
+<body>
+<script src="http://d3js.org/d3.v2.min.js?2.9.6"></script>
 <script>
-var vis = d3.select("#graph")
-            .append("svg")
-.attr("width", 200).attr("height", 200);
 
-var nodes = [
-    {x: 10, y: 50},
-    {x: 70, y: 10},
-    {x: 140, y: 50}   
-  ]
+var width = 960,
+    height = 600;
 
-vis.selectAll("circle.nodes")
-   .data(nodes)
-   .enter()
-   .append("svg:circle")
-   .attr("cx", function(d) { return d.x; })
-   .attr("cy", function(d) { return d.y; })
-   .attr("r", "10px")
-   .attr("fill", "black")
+var color = d3.scale.category20();
 
-var links = [
-  {source: nodes[0], target: nodes[1]},
-  {source: nodes[2], target: nodes[1]}
-]
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+	.on("click", recolor);
 
-vis.selectAll(".line")
-   .data(links)
-   .enter()
-   .append("line")
-   .attr("x1", function(d) { return d.source.x })
-   .attr("y1", function(d) { return d.source.y })
-   .attr("x2", function(d) { return d.target.x })
-   .attr("y2", function(d) { return d.target.y })
-   .style("stroke", "rgb(6,120,155)");
+svg.append("text")
+   .attr("x", 120)
+   .attr("y", 20)
+   .style("text-anchor", "middle")
+   .text("Karate Split on Mouse Click");
+	
+var nodesave;
+var linksave;
+var thegraph;
 
+var state=0;
+function recolor() {
+	if(state) {
+	   nodesave.style("fill", function(d) { return "yellow"; });
+	   state=0;
+	}
+	else{
+	   nodesave.data(thegraph.nodes)
+      .style("fill", function(d) { 
+         if ( d.faction == 1.0){return "blue";}
+         else {return "red"}; 
+      });
+	   state=1;
+	}
+    d3.event.stopPropagation();
+  }
+
+var force = d3.layout.force()
+    .size([width, height])
+    .charge(-500)
+    .linkDistance(function(d) { return 12 + 50; });
+
+
+d3.json("karate.json", function(graph) {
+  force
+      .nodes(graph.nodes)
+      .links(graph.links)
+      .on("tick", tick)
+      .start();
+ 
+  thegraph = graph;
+
+  link = svg.selectAll(".link")
+      .data(graph.links)
+    .enter().append("g")
+      .attr("class", "link");
+      
+  linksave = link.append("line")
+      .style("stroke-width", function(d) { return (d.weight ) + "px"; });
+
+  node = svg.selectAll(".node")
+      .data(graph.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .call(force.drag);
+
+  nodesave= node.append("circle")
+      .attr("r", function(d) { return 12; })
+	  .style("fill", function(d) { return "yellow"; });
+	  
+  node.append("text")
+      .attr("dy", ".35em")
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.actor; });
+
+  function tick() {
+    link.selectAll("line")
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  }
+  
+}
+);
 </script>
