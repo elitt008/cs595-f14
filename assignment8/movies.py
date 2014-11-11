@@ -23,21 +23,44 @@ class Movie:
 
       self.numratings = 0
       self.sumratings = 0.0
-      self.listratings = []
+      #self.listratings = []
       self.avgrating = 0.0
+
+      self.slot1 = 0
+      self.slot2 = 0.0
+      self.slot3 = 0.0
+
+
+      #demographics
+#      self.womenavgsum = 0.0
+#      self.womencount = 0
+#      self.womenavg40sum = 0.0
+#      self.womenavg40count = 0
+#      self.menavgsum = 0.0
+#      self.menavgcount = 0
+#      self.menavg40sum = 0.0
+#      self.menavg40count = 0
     
    def calculateavg(self, userlist):
+      self.slot1 = 0
+      self.slot2 = 0.0
+      self.slot3 = 0.0
       for user in userlist:
          for movie in user.ratings:
             if self.id in movie:
-               self.numratings = self.numratings + 1
-               self.listratings.append(int(movie[self.id])+0.0)
-               self.sumratings = self.sumratings + int(movie[self.id]) + 0.0
+               self.slot1 = self.slot1 + 1
+               #self.listratings.append(int(movie[self.id])+0.0)
+               self.slot2 = self.slot2 + int(movie[self.id]) + 0.0
                break
-      return round((self.sumratings / self.numratings),2)
-   def average(self,rating):
-      self.avgrating = round(((self.sumratings + rating)/ self.numratings),2)
-      return self.avgrating
+      if self.slot1 > 0:
+         return round((self.slot2 / self.slot1),2)
+      else:
+        return 0.00
+
+#remove function
+#   def average(self,rating):
+#      self.avgrating = round(((self.slot2 + rating)/ self.slot1),2)
+#      return self.avgrating
 ################################
 
 def parseItem(movielist):
@@ -51,6 +74,8 @@ def parseItem(movielist):
       movielist.append(Movie(parsed[0],parsed[1],parsed[2],
                        parsed[3],parsed[4],genre))
    fd.close() 
+
+################################
 
 ################################
 
@@ -90,26 +115,54 @@ def parseUser(userlist):
    fd.close()
 
 ################################
-
-def ordermovielist(movielist):
+# by slot 3 , slot1, average or number of ratings
+def ordermovielist(movielist,selector):
    count1 = 0
    for movie1 in movielist:
       count2 = 0
       for movie2 in movielist:
-         if movie2.avgrating > movie1.avgrating:
+         if (selector == 0 and movie2.avgrating > movie1.avgrating) or \
+            (selector == 1 and movie2.numratings > movie1.numratings) or \
+            (selector == 2 and movie2.slot3 > movie1.slot3) or \
+            (selector == 3 and movie2.slot1 > movie2.slot1):
             movielist[count1] = movie2
             movielist[count2] = movie1
          count2 = count2 + 1
       count1 = count1 + 1
-            
+
 ################################
 
-def findHighestAvgRating(movielist,highestmovies,cap):
+def orderuserlist(userlist):
+   count1 = 0
+   for user1 in userlist:
+      count2 = 0
+      for user2 in userlist:
+         if len(user2.ratings) > len(user1.ratings):
+            userlist[count1] = user2
+            userlist[count2] = user1
+         count2 = count2 + 1
+      count1 = count1 + 1
+
+#################################
+            
+#def calculateavg(mov, userlist):
+#    for user in userlist:
+#        for movie in user.ratings:
+#            if mov.id in movie:
+#                mov.num = mov.num + 1
+#                mov.listratings.append(int(movie[mov.id])+0.0)
+#                mov.sum = mov.sum + int(movie[mov.id]) + 0.0
+#                break
+#    return round((mov.sum / mov.num),2)
+
+################################1
+
+def findHighestAvgRating(movielist,highestmovies,min,cap):
    for movie in movielist:
-      if movie.numratings > 4: 
+      if movie.numratings > min: 
          if len(highestmovies) < cap:
             highestmovies.append(movie)
-            ordermovielist(highestmovies)
+            ordermovielist(highestmovies,0)
          else:
             count=0
             for mov in highestmovies:
@@ -119,14 +172,13 @@ def findHighestAvgRating(movielist,highestmovies,cap):
                   break
                count = count + 1
       
-################################
+################################2
 
 def findMostRatings(movielist,mostratings,cap):
    for movie in movielist:
-       
       if len(mostratings) < cap:
          mostratings.append(movie)
-         ordermovielist(mostratings)
+         ordermovielist(mostratings,1)
       else:
          count=0
          for mov in mostratings:
@@ -136,3 +188,181 @@ def findMostRatings(movielist,mostratings,cap):
                break
             count=count + 1
 
+################################3
+
+def womenHighestAvg(userlist,movielist,arrangedlist,min,cap):
+    print "Finding all women..."
+    genderlist=[]
+    for user in userlist:
+        if user.gender == "F":
+            genderlist.append(user)
+    print "Calculating women average..."
+    for movie in movielist:
+        average = movie.calculateavg(genderlist)
+        movie.slot3 = average
+        if movie.slot1 > min:
+            if len(arrangedlist) < cap:
+                arrangedlist.append(movie)
+                ordermovielist(arrangedlist,2)
+            else:
+                count=0
+                for mov in arrangedlist:
+                    if movie.slot3 > mov.slot3:
+                        arrangedlist.insert(count,movie)
+                        del arrangedlist[-1]
+                        break
+                    count = count + 1
+
+################################4
+
+def menHighestAvg(userlist,movielist,arrangedlist,min,cap):
+    print "Finding all men..."
+    genderlist=[]
+    for user in userlist:
+        if user.gender == "M":
+            genderlist.append(user)
+    print "Calculating men average..."
+    for movie in movielist:
+        average = movie.calculateavg(genderlist)
+        movie.slot3 = average
+        if movie.slot1 > min:
+            if len(arrangedlist) < cap:
+                arrangedlist.append(movie)
+                ordermovielist(arrangedlist,2)
+            else:
+                count=0
+                for mov in arrangedlist:
+                    if movie.slot3 > mov.slot3:
+                        arrangedlist.insert(count,movie)
+                        del arrangedlist[-1]
+                        break
+                    count = count + 1
+
+################################5
+
+def compareMovie(movielist,movie1,movie2):
+    print "unimplemented function"
+
+################################6
+
+def topRaters(userlist,arrangedlist,cap):
+   print "Finding users with the most reviews..."
+   for user in userlist:
+      if len(arrangedlist) < cap:
+         arrangedlist.append(user)
+         orderuserlist(arrangedlist)
+      else:
+         count=0
+         for person in arrangedlist:
+            if len(user.ratings) > len(person.ratings):
+               arrangedlist.insert(count,user)
+               del arrangedlist[-1]
+               break
+            count=count + 1
+
+################################7
+
+def mostAgreed(userlist,arrangedlist,cap):
+    print "unimplemented function"
+
+################################8
+
+def mostDisagreed(userlist,arrangedlist,cap):
+    print "unimplemented function"
+
+################################9
+
+def womenHighestAvgover40(userlist,movielist,arrangedlist,min,cap):
+    print "Finding all women over 40..."
+    genderlist=[]
+    for user in userlist:
+        if user.gender == "F" and int(user.age) > 40:
+            genderlist.append(user)
+    print "Calculating women over 40 average..."
+    for movie in movielist:
+        average = movie.calculateavg(genderlist)
+        movie.slot3 = average
+        if movie.slot1 > min:
+            if len(arrangedlist) < cap:
+                arrangedlist.append(movie)
+                ordermovielist(arrangedlist,2)
+            else:
+                count=0
+                for mov in arrangedlist:
+                    if movie.slot3 > mov.slot3:
+                        arrangedlist.insert(count,movie)
+                        del arrangedlist[-1]
+                        break
+                    count = count + 1
+
+
+################################10
+def menHighestAvgover40(userlist,movielist,arrangedlist,min,cap):
+    print "Finding all men over 40..."
+    genderlist=[]
+    for user in userlist:
+        if user.gender == "M" and int(user.age) > 40:
+            genderlist.append(user)
+    print "Calculating men over 40 average..."
+    for movie in movielist:
+        average = movie.calculateavg(genderlist)
+        movie.slot3 = average
+        if movie.slot1 > min:
+            if len(arrangedlist) < cap:
+                arrangedlist.append(movie)
+                ordermovielist(arrangedlist,2)
+            else:
+                count=0
+                for mov in arrangedlist:
+                    if movie.slot3 > mov.slot3:
+                        arrangedlist.insert(count,movie)
+                        del arrangedlist[-1]
+                        break
+                    count = count + 1
+##################################
+def womenHighestAvgunder40(userlist,movielist,arrangedlist,min,cap):
+    print "Finding all women under 40..."
+    genderlist=[]
+    for user in userlist:
+        if user.gender == "F" and int(user.age) < 40: 
+            genderlist.append(user)
+    print "Calculating women under 40 average..."
+    for movie in movielist:
+        average = movie.calculateavg(genderlist)
+        movie.slot3 = average
+        if movie.slot1 > min:
+            if len(arrangedlist) < cap:
+                arrangedlist.append(movie)
+                ordermovielist(arrangedlist,2)
+            else:
+                count=0
+                for mov in arrangedlist:
+                    if movie.slot3 > mov.slot3:
+                        arrangedlist.insert(count,movie)
+                        del arrangedlist[-1]
+                        break
+                    count = count + 1 
+################################10
+def menHighestAvgunder40(userlist,movielist,arrangedlist,min,cap):
+    print "Finding all men under 40..."
+    genderlist=[]
+    for user in userlist:
+        if user.gender == "M" and int(user.age) < 40:
+            genderlist.append(user)
+    print "Calculating men under 40 average..."
+    for movie in movielist:
+        average = movie.calculateavg(genderlist)
+        movie.slot3 = average
+        if movie.slot1 > min:
+            if len(arrangedlist) < cap:
+                arrangedlist.append(movie)
+                ordermovielist(arrangedlist,2)
+            else:
+                count=0
+                for mov in arrangedlist:
+                    if movie.slot3 > mov.slot3:
+                        arrangedlist.insert(count,movie)
+                        del arrangedlist[-1]
+                        break
+                    count = count + 1
+ 

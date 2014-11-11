@@ -19,6 +19,9 @@ movies.parseItem(movielist)
 print "Calculating averages..."
 for movie in movielist:
    movie.avgrating = movie.calculateavg(userlist)
+   movie.numratings = movie.slot1
+   movie.sumratings = movie.slot2
+
 #movielist=[]     
 #for i in range(10):
 #   movielist.append(Movie(1,2,3,4,5,6))
