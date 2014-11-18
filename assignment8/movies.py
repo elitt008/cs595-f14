@@ -23,24 +23,12 @@ class Movie:
 
       self.numratings = 0
       self.sumratings = 0.0
-      #self.listratings = []
       self.avgrating = 0.0
 
       self.slot1 = 0
       self.slot2 = 0.0
       self.slot3 = 0.0
 
-
-      #demographics
-#      self.womenavgsum = 0.0
-#      self.womencount = 0
-#      self.womenavg40sum = 0.0
-#      self.womenavg40count = 0
-#      self.menavgsum = 0.0
-#      self.menavgcount = 0
-#      self.menavg40sum = 0.0
-#      self.menavg40count = 0
-    
    def calculateavg(self, userlist):
       self.slot1 = 0
       self.slot2 = 0.0
@@ -57,10 +45,6 @@ class Movie:
       else:
         return 0.00
 
-#remove function
-#   def average(self,rating):
-#      self.avgrating = round(((self.slot2 + rating)/ self.slot1),2)
-#      return self.avgrating
 ################################
 
 def parseItem(movielist):
@@ -74,8 +58,6 @@ def parseItem(movielist):
       movielist.append(Movie(parsed[0],parsed[1],parsed[2],
                        parsed[3],parsed[4],genre))
    fd.close() 
-
-################################
 
 ################################
 
@@ -116,44 +98,36 @@ def parseUser(userlist):
 
 ################################
 # by slot 3 , slot1, average or number of ratings
-def ordermovielist(movielist,selector):
-   count1 = 0
-   for movie1 in movielist:
-      count2 = 0
-      for movie2 in movielist:
-         if (selector == 0 and movie2.avgrating > movie1.avgrating) or \
-            (selector == 1 and movie2.numratings > movie1.numratings) or \
-            (selector == 2 and movie2.slot3 > movie1.slot3) or \
-            (selector == 3 and movie2.slot1 > movie2.slot1):
-            movielist[count1] = movie2
-            movielist[count2] = movie1
-         count2 = count2 + 1
-      count1 = count1 + 1
+#def ordermovielist(movielist,selector):
+#   count1 = 0
+#   for movie1 in movielist:
+#      count2 = 0
+#      for movie2 in movielist:
+#         if (selector == 0 and movie2.avgrating > movie1.avgrating) or \
+#            (selector == 1 and movie2.numratings > movie1.numratings) or \
+#            (selector == 2 and movie2.slot3 > movie1.slot3) or \
+#            (selector == 3 and movie2.slot1 > movie2.slot1):
+#             movielist.insert(count1,movie2)
+#             movielist.insert(count2,movie1)
+#             del movielist[count1+1]
+#             del movielist[count2+1]
+#         #   movielist[count1] = movie2
+#         #   movielist[count2] = movie1
+#         count2 = count2 + 1
+#      count1 = count1 + 1
 
 ################################
 
-def orderuserlist(userlist):
-   count1 = 0
-   for user1 in userlist:
-      count2 = 0
-      for user2 in userlist:
-         if len(user2.ratings) > len(user1.ratings):
-            userlist[count1] = user2
-            userlist[count2] = user1
-         count2 = count2 + 1
-      count1 = count1 + 1
-
-#################################
-            
-#def calculateavg(mov, userlist):
-#    for user in userlist:
-#        for movie in user.ratings:
-#            if mov.id in movie:
-#                mov.num = mov.num + 1
-#                mov.listratings.append(int(movie[mov.id])+0.0)
-#                mov.sum = mov.sum + int(movie[mov.id]) + 0.0
-#                break
-#    return round((mov.sum / mov.num),2)
+#def orderuserlist(userlist):
+#   count1 = 0
+#   for user1 in userlist:
+#      count2 = 0
+#      for user2 in userlist:
+#         if len(user2.ratings) > len(user1.ratings):
+#            userlist[count1] = user2
+#            userlist[count2] = user1
+#         count2 = count2 + 1
+#      count1 = count1 + 1
 
 ################################1
 
@@ -162,7 +136,7 @@ def findHighestAvgRating(movielist,highestmovies,min,cap):
       if movie.numratings > min: 
          if len(highestmovies) < cap:
             highestmovies.append(movie)
-            ordermovielist(highestmovies,0)
+            #ordermovielist(highestmovies,0)
          else:
             count=0
             for mov in highestmovies:
@@ -171,14 +145,14 @@ def findHighestAvgRating(movielist,highestmovies,min,cap):
                   del highestmovies[-1]
                   break
                count = count + 1
-      
+
 ################################2
 
 def findMostRatings(movielist,mostratings,cap):
    for movie in movielist:
       if len(mostratings) < cap:
          mostratings.append(movie)
-         ordermovielist(mostratings,1)
+         #ordermovielist(mostratings,1)
       else:
          count=0
          for mov in mostratings:
@@ -203,7 +177,7 @@ def womenHighestAvg(userlist,movielist,arrangedlist,min,cap):
         if movie.slot1 > min:
             if len(arrangedlist) < cap:
                 arrangedlist.append(movie)
-                ordermovielist(arrangedlist,2)
+                #ordermovielist(arrangedlist,2)
             else:
                 count=0
                 for mov in arrangedlist:
@@ -228,7 +202,7 @@ def menHighestAvg(userlist,movielist,arrangedlist,min,cap):
         if movie.slot1 > min:
             if len(arrangedlist) < cap:
                 arrangedlist.append(movie)
-                ordermovielist(arrangedlist,2)
+                #ordermovielist(arrangedlist,2)
             else:
                 count=0
                 for mov in arrangedlist:
@@ -250,7 +224,7 @@ def topRaters(userlist,arrangedlist,cap):
    for user in userlist:
       if len(arrangedlist) < cap:
          arrangedlist.append(user)
-         orderuserlist(arrangedlist)
+         #orderuserlist(arrangedlist)
       else:
          count=0
          for person in arrangedlist:
@@ -259,16 +233,6 @@ def topRaters(userlist,arrangedlist,cap):
                del arrangedlist[-1]
                break
             count=count + 1
-
-################################7
-
-def mostAgreed(userlist,arrangedlist,cap):
-    print "unimplemented function"
-
-################################8
-
-def mostDisagreed(userlist,arrangedlist,cap):
-    print "unimplemented function"
 
 ################################9
 
@@ -285,7 +249,7 @@ def womenHighestAvgover40(userlist,movielist,arrangedlist,min,cap):
         if movie.slot1 > min:
             if len(arrangedlist) < cap:
                 arrangedlist.append(movie)
-                ordermovielist(arrangedlist,2)
+                #ordermovielist(arrangedlist,2)
             else:
                 count=0
                 for mov in arrangedlist:
@@ -310,7 +274,7 @@ def menHighestAvgover40(userlist,movielist,arrangedlist,min,cap):
         if movie.slot1 > min:
             if len(arrangedlist) < cap:
                 arrangedlist.append(movie)
-                ordermovielist(arrangedlist,2)
+                #ordermovielist(arrangedlist,2)
             else:
                 count=0
                 for mov in arrangedlist:
@@ -333,7 +297,7 @@ def womenHighestAvgunder40(userlist,movielist,arrangedlist,min,cap):
         if movie.slot1 > min:
             if len(arrangedlist) < cap:
                 arrangedlist.append(movie)
-                ordermovielist(arrangedlist,2)
+                #ordermovielist(arrangedlist,2)
             else:
                 count=0
                 for mov in arrangedlist:
@@ -356,7 +320,7 @@ def menHighestAvgunder40(userlist,movielist,arrangedlist,min,cap):
         if movie.slot1 > min:
             if len(arrangedlist) < cap:
                 arrangedlist.append(movie)
-                ordermovielist(arrangedlist,2)
+                #ordermovielist(arrangedlist,2)
             else:
                 count=0
                 for mov in arrangedlist:
@@ -365,4 +329,52 @@ def menHighestAvgunder40(userlist,movielist,arrangedlist,min,cap):
                         del arrangedlist[-1]
                         break
                     count = count + 1
- 
+##################################################
+#def findnextcorrelationlist(relationlist, previouslist, num,rp,sign)
+#    topcorrelations = []
+#    for item1 in previouslist:
+#        for item2 in relationlist:
+#            if item2[1] == item2[2]:
+#                templist = []
+#                for i in range(0,num - 1):
+#                    templist.append(item1[i])
+#                templist.append(item2[2])
+#                topcorrelations.append(templist)
+#    removeDuplicates(topcorrelations)
+#    correlateItems(topcorrelations,prefs,level,rp,sign)
+#    return topcorrelations
+###################################################
+#def removeDuplicates(correlationlist)
+#    count = 0 
+#    removeindex = []
+#    for item in correlationlist:
+#        if len(item) != len(set(item)):
+#            removeindex.append(count)
+#        count = count + 1 
+#
+#    count = 0 
+#    for integer in removeindex:
+#        del correlationlist[integer - count]
+#        count = count + 1
+####################################################
+#def correlateItems(correlationlist,prefs,level,rp,sign)
+#    count = 0
+#    removeindex = []
+#    for item in correlationlist:
+#        pearsonstuff(level,removeindex,0,rp,sign)
+#        count = count + 1
+#
+#    count = 0
+#    for integer in removeindex:
+#        del correlationlist[integer - count]
+#        count = count + 1
+######################################################
+#def pearsonstuff(num,removeindex,count,rp,sign)
+#    pearson = recommendations.sim_pearson(prefs,item[0],item[3])
+#    count = count + 1
+#    if (sign * pearson) < (sign * rp):
+#        removeindex.append(count)
+#    elif((num-2) == count):
+##        pearsonstuff(num,removeindex,count,rp,sign)
+#    
+#
